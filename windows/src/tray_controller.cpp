@@ -100,10 +100,9 @@ void TrayController::show_menu(const RefreshSnapshot& snapshot) {
 
             HMENU submenu = CreatePopupMenu();
             if (submenu) {
-                AppendMenuW(submenu, MF_STRING | MF_DISABLED, 0, account.status.c_str());
-                AppendMenuW(submenu, MF_SEPARATOR, 0, nullptr);
                 AppendMenuW(submenu, MF_STRING, CommandRemoveAccountBase + index, L"Remove from list");
-                AppendMenuW(menu, MF_POPUP, reinterpret_cast<UINT_PTR>(submenu), account.email.c_str());
+                const std::wstring title = account.email + L" - " + account.status;
+                AppendMenuW(menu, MF_POPUP, reinterpret_cast<UINT_PTR>(submenu), title.c_str());
                 removable_accounts_.push_back(account.email);
                 ++index;
             }
