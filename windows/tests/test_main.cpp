@@ -1,4 +1,5 @@
 #include "codex_auth_reader.h"
+#include "account_history_store.h"
 #include "simple_json.h"
 #include "usage_formatter.h"
 
@@ -65,11 +66,37 @@ void auth_tests() {
     DeleteFileW(path.c_str());
 }
 
+void account_history_tests() {
+    const std::wstring key = L"Software\\RestimeTests\\" + std::to_wstring(GetTickCount64());
+    const restime::AccountHistoryStore store(key);
+    const auto older = std::chrono::system_clock::time_point(std::chrono::seconds(100));
+    const auto newer = std::chrono::system_clock::time_point(std::chrono::seconds(200));
+
+    store.save(L"first@example.com", L"old", older);
+    store.save(L"second@example.com", L"second", newer);
+    store.save(L"FIRST@example.com", L"updated", newer + std::chrono::seconds(1));
+
+    auto accounts = store.accounts();
+    expect(accounts.size() == 2, "history deduplicates accounts");
+    expect(accounts[0].email == L"FIRST@example.com", "history sorts newest first");
+    expect(accounts[0].status == L"updated", "history updates status");
+
+    auto excluding = store.accounts(L"first@example.com");
+    expect(excluding.size() == 1 && excluding[0].email == L"second@example.com", "history excludes current account");
+
+    store.remove(L"SECOND@example.com");
+    accounts = store.accounts();
+    expect(accounts.size() == 1 && accounts[0].email == L"FIRST@example.com", "history removes case-insensitively");
+
+    RegDeleteTreeW(HKEY_CURRENT_USER, key.c_str());
+}
+
 }  // namespace
 
 int main() {
     parser_tests();
     auth_tests();
+    account_history_tests();
 
     if (failures != 0) {
         std::cerr << failures << " test(s) failed\n";

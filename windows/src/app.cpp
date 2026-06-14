@@ -179,6 +179,9 @@ void App::handle_command(UINT command) {
         DestroyWindow(window_);
         break;
     default:
+        if (tray_ && tray_->remove_account_command(command)) {
+            break;
+        }
         break;
     }
 }
@@ -193,6 +196,17 @@ void App::apply_snapshot(std::unique_ptr<RefreshSnapshot> snapshot) {
     }
     if (snapshot->account_email.empty()) {
         snapshot->account_email = snapshot_.account_email;
+    }
+
+    if (!snapshot->account_email.empty() && !same_email(snapshot->account_email, snapshot_.account_email)) {
+        if (!snapshot_.account_email.empty() && snapshot_.usage) {
+            account_history_.save(snapshot_.account_email, menu_title(snapshot_.usage));
+        }
+        account_history_.record_login(snapshot->account_email, menu_title(std::nullopt));
+    }
+
+    if (!snapshot->account_email.empty() && snapshot->usage) {
+        account_history_.save(snapshot->account_email, menu_title(snapshot->usage));
     }
 
     snapshot_ = std::move(*snapshot);

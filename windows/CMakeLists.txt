@@ -11,6 +11,7 @@ if(MSVC)
 endif()
 
 add_library(restime_core
+  src/account_history_store.cpp
   src/codex_auth_reader.cpp
   src/codex_usage_reader.cpp
   src/session_usage_reader.cpp

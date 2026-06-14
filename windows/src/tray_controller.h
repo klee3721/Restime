@@ -1,10 +1,13 @@
 #pragma once
 
+#include "account_history_store.h"
 #include "settings.h"
 #include "usage.h"
 
 #include <Windows.h>
 #include <shellapi.h>
+
+#include <vector>
 
 namespace restime {
 
@@ -14,7 +17,9 @@ enum TrayCommand : UINT {
     CommandRefresh = 1001,
     CommandStartWithWindows = 1002,
     CommandAbout = 1003,
-    CommandQuit = 1004
+    CommandQuit = 1004,
+    CommandRemoveAccountBase = 2000,
+    CommandRemoveAccountLast = 2099
 };
 
 class TrayController {
@@ -27,6 +32,7 @@ public:
     void restore_after_explorer_restart();
     void update(const RefreshSnapshot& snapshot);
     void show_menu(const RefreshSnapshot& snapshot);
+    bool remove_account_command(UINT command);
 
 private:
     HICON create_icon(const RefreshSnapshot& snapshot) const;
@@ -38,6 +44,8 @@ private:
     HICON icon_ = nullptr;
     bool added_ = false;
     Settings settings_;
+    AccountHistoryStore account_history_;
+    std::vector<std::wstring> removable_accounts_;
 };
 
 }  // namespace restime

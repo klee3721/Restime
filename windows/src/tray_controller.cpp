@@ -86,6 +86,30 @@ void TrayController::show_menu(const RefreshSnapshot& snapshot) {
         append_disabled(menu, L"Last refresh failed: " + snapshot.error);
     }
 
+    const auto accounts = account_history_.accounts(snapshot.account_email);
+    removable_accounts_.clear();
+    if (!accounts.empty()) {
+        AppendMenuW(menu, MF_SEPARATOR, 0, nullptr);
+        append_disabled(menu, L"Accounts on this PC");
+
+        UINT index = 0;
+        for (const auto& account : accounts) {
+            if (index > CommandRemoveAccountLast - CommandRemoveAccountBase) {
+                break;
+            }
+
+            HMENU submenu = CreatePopupMenu();
+            if (submenu) {
+                AppendMenuW(submenu, MF_STRING | MF_DISABLED, 0, account.status.c_str());
+                AppendMenuW(submenu, MF_SEPARATOR, 0, nullptr);
+                AppendMenuW(submenu, MF_STRING, CommandRemoveAccountBase + index, L"Remove from list");
+                AppendMenuW(menu, MF_POPUP, reinterpret_cast<UINT_PTR>(submenu), account.email.c_str());
+                removable_accounts_.push_back(account.email);
+                ++index;
+            }
+        }
+    }
+
     AppendMenuW(menu, MF_SEPARATOR, 0, nullptr);
     AppendMenuW(menu, MF_STRING, CommandRefresh, L"Refresh now");
     AppendMenuW(
@@ -103,6 +127,20 @@ void TrayController::show_menu(const RefreshSnapshot& snapshot) {
     TrackPopupMenu(menu, TPM_RIGHTBUTTON | TPM_BOTTOMALIGN | TPM_LEFTALIGN, point.x, point.y, 0, window_, nullptr);
     PostMessageW(window_, WM_NULL, 0, 0);
     DestroyMenu(menu);
+}
+
+bool TrayController::remove_account_command(UINT command) {
+    if (command < CommandRemoveAccountBase || command > CommandRemoveAccountLast) {
+        return false;
+    }
+
+    const size_t index = command - CommandRemoveAccountBase;
+    if (index >= removable_accounts_.size()) {
+        return true;
+    }
+
+    account_history_.remove(removable_accounts_[index]);
+    return true;
 }
 
 HICON TrayController::create_icon(const RefreshSnapshot& snapshot) const {

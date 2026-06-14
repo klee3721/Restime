@@ -1,5 +1,6 @@
 #pragma once
 
+#include "account_history_store.h"
 #include "refresh_coordinator.h"
 #include "settings.h"
 #include "tray_controller.h"
@@ -34,6 +35,7 @@ private:
     std::unique_ptr<TrayController> tray_;
     std::unique_ptr<RefreshCoordinator> refresh_;
     Settings settings_;
+    AccountHistoryStore account_history_;
 };
 
 }  // namespace restime
