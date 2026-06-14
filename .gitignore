@@ -1,6 +1,7 @@
 build/
 out/
 dist/
+release-assets/
 .vs/
 .build/
 DerivedData/
