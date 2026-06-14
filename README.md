@@ -1,47 +1,36 @@
-# Restime for Windows
+# Restime
 
-Lightweight Windows system tray app for Codex usage.
+Restime is a lightweight Codex usage monitor for desktop.
 
-This project intentionally uses native C++/Win32 APIs instead of Electron,
-WebView, WPF, or WinUI so the app can stay small in RAM while idle.
+It has two native apps:
 
-## Build
+- `windows/`: Windows system tray app built with C++/Win32 for minimal RAM and CPU usage.
+- `macos/`: macOS menu bar app built with Swift/AppKit.
 
-Install:
+Both versions read Codex auth/session data from the local `.codex` directory and avoid spawning the Codex CLI during refresh.
 
-- Visual Studio 2022 Build Tools
-- Desktop development with C++
-- Windows 10/11 SDK
-- CMake
-- Ninja
-
-Then build:
+## Windows
 
 ```powershell
+cd windows
 .\tools\build-release.ps1
 ```
 
-Run the command from "x64 Native Tools Command Prompt for VS" or
-"Developer PowerShell for VS" so `cl.exe` and the Windows SDK are available.
-
-The executable will be:
+The executable is created at:
 
 ```text
-build\release\Restime.exe
+windows\build\release\Restime.exe
 ```
 
-## Run Tests
+## macOS
 
-```powershell
-.\tools\test.ps1
+```sh
+cd macos
+make app
 ```
 
-## Behavior
+The app bundle is created at:
 
-- Shows a tray icon in the Windows notification area.
-- Tooltip displays `5h X% HH:mm | W Y% d/M`.
-- Reads Codex auth from `%USERPROFILE%\.codex\auth.json`.
-- Calls `https://chatgpt.com/backend-api/wham/usage`.
-- Falls back to `%USERPROFILE%\.codex\sessions\**\*.jsonl` when the API fails.
-- Does not spawn the Codex CLI.
-- Supports `Refresh now`, `Start with Windows`, and `Quit`.
+```text
+macos/.build/Restime.app
+```
