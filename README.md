@@ -10,9 +10,9 @@ low.
 
 Get the latest builds from the GitHub Releases page:
 
-- Windows: `Restime-0.1.0-windows-x64.exe`
-- macOS: `Restime-0.1.0-macos-universal.dmg`
-- Checksums: `checksums-sha256.txt`
+- [Download for Windows](https://github.com/klee3721/Restime/releases/download/v0.1.0/Restime-0.1.0-windows-x64.exe)
+- [Download for macOS](https://github.com/klee3721/Restime/releases/download/v0.1.0/Restime-0.1.0-macos-universal.dmg)
+- [SHA-256 checksums](https://github.com/klee3721/Restime/releases/download/v0.1.0/checksums-sha256.txt)
 
 ## Platforms
 
